@@ -1,0 +1,41 @@
+import numpy as np
+from sklearn.base import BaseEstimator, RegressorMixin
+from scipy.optimize import curve_fit
+
+
+class CustomQuadraticRegressor(BaseEstimator, RegressorMixin):
+ def _init_(self):
+ self.a = 1.0
+ self.b = 1.0
+ self.c = 1.0
+ self.d = 1.0
+ 
+ 
+ def fit(self, X, y):
+ X = np.array(X)
+ y = np.array(y)
+ def quadratic_function(x, a, b, c, d):
+ return (a * x**2 + b * x) / (c * x + d)
+ params, _ = curve_fit(quadratic_function, X, y)
+ 
+ self.a, self.b, self.c, self.d = params
+ return self
+ def predict(self, X):
+ X = np.array(X)
+ predictions = (self.a * X**2 + self.b * X) / (self.c * X + self.d)
+ return predictions
+ 
+custom_regressor = CustomQuadraticRegressor()
+
+X_train = np.array([1, 2, 3, 4, 5])
+y_train = np.array([1.1, 2.8, 6.5, 12.0, 20.3])
+
+custom_regressor.fit(X_train, y_train)
+
+a_pred = custom_regressor.a
+b_pred = custom_regressor.b
+c_pred = custom_regressor.c
+d_pred = custom_regressor.d
+
+
+print(f"a_pred: {a_pred}, b_pred: {b_pred}, c_pred: {c_pred}, d_pred: {d_pred}")
