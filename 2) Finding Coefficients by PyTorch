@@ -1,0 +1,55 @@
+αxi+βx2i+γx3i=yi
+ 
+where α, β, and γ are the coefficients to be learnt.
+
+Below is the code ------------------------------------------------------
+
+
+import torch
+from torch.optim import Adam
+
+mat1 = torch.tensor([[1.,1.]],requires_grad=False)
+mat2 = torch.randn(2,1,requires_grad=True)
+mat3 = torch.randn(1,1,requires_grad=True)
+
+optim = Adam([ {'params': mat2},  {'params' :mat3} ], lr=1e-4)
+
+print("Mat1 size : {}".format(mat1.size()))
+print("Mat2 size : {}".format(mat2.size()))
+print("Mat3 size : {}".format(mat3.size()))
+
+
+def forward(x) :
+   middle = x*mat1
+
+   print("Middle : {}".format(middle))
+
+   middle[0,0] = middle[0,0]**2
+   middle[0,1] = middle[0,1]**3
+
+   print("Middle : {}".format(middle))
+
+   final = torch.matmul(middle,mat2)+ mat3*x
+   return final
+
+def loss(pred,truth) :
+   return (pred-truth)**2
+
+target = torch.tensor([30.]) # y is set equal to 30.
+x = torch.tensor([40.])      # x is set equal to 40.
+
+num_epochs =100000
+
+while(num_epochs>0) :
+   optim.zero_grad()
+   prediction = forward(x)
+   loss_val = loss(prediction,target)
+   loss_val.backward()
+   optim.step()
+
+   print("Prediction : {}".format(prediction))
+   print("Alpha : {}".format(mat3[0,0]))
+   print("Beta : {}".format(mat2[0,0]))
+   print("Gamma : {}".format(mat2[1,0]))
+
+num_epochs -= 1
